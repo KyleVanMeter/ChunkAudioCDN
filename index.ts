@@ -1,6 +1,9 @@
 import * as Ex from 'express';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs, { ReadStream } from 'fs';
+
 const app: express.Application = express();
 const audioExt: Set<String> = new Set([
     "mp3",
@@ -22,9 +25,14 @@ app.use((req: express.Request, res: express.Response) => {
     if (!audioExt.has(reqExt)) {
         res.sendStatus(403);
     } else {
-        res.json({ what: "hi!" });
+        const fileName: string = decodeURIComponent(path.join("E:\\Music\\Main\\", req.url));
+        console.log(fileName);
+
+        const src: ReadStream = fs.createReadStream(fileName).on('data', (chunk: String) => {
+            console.log(chunk);
+        });
+        src.pipe(res);
     }
 });
 
-app.use(express.static("E:/Music/Main/"));
 app.listen(port, () => console.log(`Server listening on port ${port}`));
